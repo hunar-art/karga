@@ -1,0 +1,192 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+    .selwidth{
+        width: 100%;
+    }
+
+</style>
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="card card-info">
+      <div class="card-header">
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-toggle="collapse" data-target="#part_form" aria-expanded="false" aria-controls="part_form">
+              <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <h3 class="text-center">ناساندنی گروپی فەرعی</h3>
+
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form id="part_form" role="form" method="POST">{% csrf_token %}
+        <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>گروپی سەرەکی</label>
+                  {{form.main_type | add_class:'form-control selwidth'}}
+                  <p id="main_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+              </div>
+              <!-- /.col -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>ناوی گروپی کاڵا</label>
+                  {{form.part_group | add_class:'form-control'}}
+                  <p id="part_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+              </div>
+              <!-- /.col -->
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-success">زیادکردن</button>
+          </div>
+      </form>
+      
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-center">زانیاریە تۆمار کراوەکان</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive">
+        <table id="maingroupid" class="table table-bordered table-striped text-center">
+        <thead>              
+          <tr>
+            <th>#</th>
+            <th>ئەدمین</th>
+            <th>ناوی سەرەکی</th>
+            <th>ناوی گروپ</th>
+            <th>بەروار</th>
+            <th>کردارەکان</th>
+          </tr>
+          </thead>
+          <tbody>
+        {% for i in lists %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.admin}}</td>
+            <td>{{i.main_type}}</td>
+            <td>{{i.part_group}}</td>
+            <td>{{i.date | date:'d-m-Y h:i A'}}</td>
+            <td>
+              <a href="{% url 'products:update_partgroup' i.id %}"><button class="bg-info"><i class="far fa-edit"></i></button></a>
+              <a onclick="return confirm('دڵنیایت لە سڕینەوەی  ({{i.part_group}} ) ')" href="{% url 'products:delete_partgroup' i.id %}"><button class="bg-danger"><i class="far fa-trash"></i></button></a>
+
+            </td>
+
+        </tr>
+          {% endfor %}
+
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  
+{% block script %}
+
+    <script>
+        $(document).ready(function() {
+            $('#maingroupid').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy','excel','pdf','print','colvis'
+                ]
+            } );
+
+            $('#id_main_type').select2();
+
+        } );
+
+        {% if messages %}
+        {% for msg in messages %}
+            {% if msg.tags == 'success' %}
+                alertify.success("{{msg}}")
+            {% elif msg.tags == 'error' %}
+                alertify.error("{{msg}}")          
+            {% elif msg.tags == 'info' %}
+                alertify.alert('ئاگاداربە! ','message')
+                alertify.alert("{{msg}}",function(){            
+              })
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+    </script>
+    
+    <script>
+    const form = document.getElementById('part_form')
+    form.addEventListener("submit",submitHandler);
+
+    function submitHandler(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'products:partgroup' %}',
+            data : $('#part_form').serialize(),
+            dataType: 'json', 
+            success: successFunction,
+        });
+    }
+    function successFunction(data) {
+        if (data.success) {
+            form.reset();
+            location.reload(true); 
+        }
+        else if(data.error_code=='invalid'){
+            for(var key in data.error_msg){
+                if(key == 'main_type'){
+                    document.getElementById('main_error').removeAttribute('hidden')
+                    document.getElementById('main_error').innerHTML = data.error_msg[key][0]
+                }
+                else if(key == 'part_group'){
+                    document.getElementById('part_error').removeAttribute('hidden')
+                    document.getElementById('part_error').innerHTML = data.error_msg[key][0]                    
+                }
+                else{
+                    document.getElementById('part_error').removeAttribute('hidden')
+                    document.getElementById('part_error').innerHTML = data.error_msg[key][0]  
+                    console.log(data.error_msg[key][0]) 
+                }
+            }
+        }
+    }
+
+    </script>
+{% endblock %}
+{% endblock %}
+
+<!-- $.ajax({        
+    url:'{% url 'products:list-maingroup' %}',
+    type:'json',
+    method:'GET',
+    success:function(data){
+    // $('#notify').html(data.length)
+    let content='';
+    for(i = 0;i < data.length; i++){
+
+        content+='<tr>'
+            +'<td>'+data[i]+'</td>'
+            +'<td>'+data[i]["fields"]["admin"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["main_type"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["date"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+
+            +'</div>'
+    
+    $(".allnotifi").html(content);
+}
+}}); -->

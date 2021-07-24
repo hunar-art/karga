@@ -1,0 +1,116 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="card card-info">
+      <div class="card-header">
+        <h3 class="card-title text-center">زیادکردنی ناوی گروپی سەرەکی</h3>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form id="main_form" role="form" method="POST">{% csrf_token %}
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="mainGroup" class="col-sm-2 control-label">ناوی سەرەکی</label>
+                <div class="col-sm-10">
+                  {{form.main_type | attr:'id:mainGroup'}}
+                  <p id="main_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+                </div>
+              </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+            <button type="submit" class="btn btn-success">زیادکردن</button>
+            <a href="{% url 'products:maingroup' %}"><button class="btn btn-danger">پەشیمان بونەوە</button></a>
+          </div>
+      </form>
+      
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">زانیاریە تۆمار کراوەکان</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive">
+        <table id="maingroupid" class="table table-bordered table-striped text-center">
+        <thead>              
+          <tr>
+            <th>#</th>
+            <th>ئەدمین</th>
+            <th>ناوی سەرەکی</th>
+            <th>بەروار</th>
+            <th>کردارەکان</th>
+          </tr>
+          </thead>
+          <tbody>
+        {% for i in lists %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.admin}}</td>
+            <td>{{i.main_type}}</td>
+            <td>{{i.date}}</td>
+            <td>
+                <a href="{% url 'products:update_maingroup' i.id %}"><button><i class="far fa-edit"></i></button></a>
+            </td>
+
+        </tr>
+          {% endfor %}
+
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  
+{% block script %}
+
+    <script>
+        $(document).ready(function() {
+            $('#maingroupid').DataTable( {
+                dom: 'Bfrtip',
+            } );
+        } );
+
+        {% if messages %}
+        {% for msg in messages %}
+            {% if msg.tags == 'success' %}
+                alertify.success("{{msg}}")
+            {% else %}
+                alertify.error("{{msg}}")          
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+    </script>
+    
+{% endblock %}
+{% endblock %}
+
+<!-- $.ajax({        
+    url:'{% url 'products:list-maingroup' %}',
+    type:'json',
+    method:'GET',
+    success:function(data){
+    // $('#notify').html(data.length)
+    let content='';
+    for(i = 0;i < data.length; i++){
+
+        content+='<tr>'
+            +'<td>'+data[i]+'</td>'
+            +'<td>'+data[i]["fields"]["admin"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["main_type"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["date"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+
+            +'</div>'
+    
+    $(".allnotifi").html(content);
+}
+}}); -->

@@ -1,0 +1,164 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="card card-info">
+      <div class="card-header">
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-toggle="collapse" data-target="#main_form" aria-expanded="false" aria-controls="main_form">
+              <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <h3 class="text-center">ناساندنی کاڵای سەرەکی</h3>
+
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form id="main_form" role="form" method="POST">{% csrf_token %}
+        <div class="card-body">
+            <div class="form-group row">
+                <label for="mainGroup" class="col-sm-2 control-label">ناوی سەرەکی</label>
+                <div class="col-sm-10">
+                  {{form.main_type | attr:'id:mainGroup'}}
+                  <p id="main_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+                </div>
+              </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+            <button type="submit" class="btn btn-success">زیادکردن</button>
+          </div>
+      </form>
+      
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-center">زانیاریە تۆمار کراوەکان</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive">
+        <table id="maingroupid" class="table table-bordered table-striped text-center">
+        <thead>              
+          <tr>
+            <th>#</th>
+            <th>ئەدمین</th>
+            <th>ناوی سەرەکی</th>
+            <th>بەروار</th>
+            <th>کردارەکان</th>
+          </tr>
+          </thead>
+          <tbody>
+        {% for i in lists %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.admin}}</td>
+            <td>{{i.main_type}}</td>
+            <td>{{i.date | date:'d-m-Y h:i A'}}</td>
+            <td>
+                <a href="{% url 'products:update_maingroup' i.id %}"><button class="bg-info"><i class="far fa-edit"></i></button></a>
+                <a onclick="return confirm('دڵنیایت لە سڕینەوەی  ({{i.main_type}} ) ')" href="{% url 'products:delete_maingroup' i.id %}"><button class="bg-danger"><i class="far fa-trash"></i></button></a>
+
+            </td>
+
+        </tr>
+          {% endfor %}
+
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  
+{% block script %}
+
+    <script>
+        $(document).ready(function() {
+            $('#maingroupid').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy','excel','pdf','print','colvis'
+                ]
+            } );
+        } );
+
+        {% if messages %}
+        {% for msg in messages %}
+            {% if msg.tags == 'success' %}
+                alertify.success("{{msg}}")
+            {% elif msg.tags == 'error' %}
+                alertify.error("{{msg}}")          
+            {% elif msg.tags == 'info' %}
+                alertify.alert('ئاگاداربە! ','message')
+                alertify.alert("{{msg}}",function(){            
+              })
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+    </script>
+    
+    <script>
+    const form = document.getElementById('main_form')
+    form.addEventListener("submit",submitHandler);
+
+    function submitHandler(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'products:maingroup' %}',
+            data : $('#main_form').serialize(),
+            dataType: 'json', 
+            success: successFunction,
+        });
+    }
+    function successFunction(data) {
+        if (data.success) {
+            form.reset();
+            location.reload(true); 
+        }
+        else if(data.error_code=='invalid'){
+            for(var key in data.error_msg){
+                if(key == 'main_type'){
+                    document.getElementById('main_error').removeAttribute('hidden')
+                    document.getElementById('main_error').innerHTML = data.error_msg[key][0]
+
+                }
+
+
+            }
+        }
+    }
+
+
+    </script>
+{% endblock %}
+{% endblock %}
+
+<!-- $.ajax({        
+    url:'{% url 'products:list-maingroup' %}',
+    type:'json',
+    method:'GET',
+    success:function(data){
+    // $('#notify').html(data.length)
+    let content='';
+    for(i = 0;i < data.length; i++){
+
+        content+='<tr>'
+            +'<td>'+data[i]+'</td>'
+            +'<td>'+data[i]["fields"]["admin"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["main_type"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["date"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+
+            +'</div>'
+    
+    $(".allnotifi").html(content);
+}
+}}); -->

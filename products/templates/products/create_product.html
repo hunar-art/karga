@@ -1,0 +1,312 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+    .selwidth{
+        width: 100%;
+    }
+
+</style>
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="card card-info">
+        <div class="card-header">
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-toggle="collapse" data-target="#product_form" aria-expanded="false" aria-controls="product_form">
+                  <i class="fas fa-minus"></i>
+                </button>
+              </div>
+            <h3 class="text-center">ناساندنی کاڵا</h3>
+
+          </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form id="product_form" role="form" method="POST" data-partgroups-url="{% url 'products:ajax-dropdown' %}">{% csrf_token %}
+        <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>گروپی سەرەکی</label>
+                  {{form.category | add_class:'form-control selwidth'}}
+                  <p id="category_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+
+                <div class="form-group">
+                  <label>ناوی گروپی کاڵا</label>
+                  {{form.part_group | add_class:'form-control selwidth'}}
+                  <p id="part_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>گروپی کاڵا</label>
+                  {{form.product_group | add_class:'form-control selwidth'}}
+                  <p id="product_group_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+     
+                <div class="form-group">
+                  <label>ناوی کاڵا</label>
+                  {{form.product_name | add_class:'form-control'}}
+                  <p id="product_name_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>عەدەد لە کارتۆن</label>
+                  {{form.qnt_in_box | add_class:'form-control'}}
+                  <p id="qnt_in_box_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+    
+                <div class="form-group">
+                  <label>کێشی کارتۆن</label>
+                  {{form.kg_box | add_class:'form-control'}}
+                  <p id="kg_box_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                    <label>کێشی دانە</label>
+                    {{form.kg_single | add_class:'form-control'}}
+                    <p id="kg_single_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+  
+                </div>
+                <div class="form-group">
+                  <label>زانیاری 1</label>
+                  {{form.info_1 | add_class:'form-control'}}
+                  <p id="info_1_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+                </div>
+    
+              </div>
+
+              <!-- ---- -->
+              <div class="col-md-6">
+                <div class="form-group">
+                    <label>زانیاری 2</label>
+                    {{form.info_2 | add_class:'form-control'}}
+                    <p id="info_2_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+  
+                </div>
+                </div>
+                <div class="col-md-6">
+                <div class="form-group">
+                  <label>زانیاری 3</label>
+                  {{form.info_3 | add_class:'form-control'}}
+                  <p id="info_3_error" class="alert alert-danger" aria-disabled="true" hidden></p>
+                </div>
+    
+              </div>                          
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-success">زیادکردن</button>
+          </div>
+      </form>
+      
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-center">زانیاریە تۆمار کراوەکان</h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive">
+        <table id="maingroupid" class="table table-bordered table-striped text-center">
+        <thead>              
+          <tr>
+            <th>#</th>
+            <th>ئەدمین</th>
+            <th>ناوی سەرەکی</th>
+            <th>ناوی گروپی فەرعی</th>
+            <th>ناوی گروپی کاڵا</th>
+            <th>کاڵا</th>
+            <th>عەدەد لە کارتۆن</th>
+            <th>کێشی کارتۆن</th>
+            <th>کێشی دانە</th>
+
+            <th>بەروار</th>
+            <th>کردارەکان</th>
+          </tr>
+          </thead>
+          <tbody>
+        {% for i in lists %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.admin}}</td>
+            <td>{{i.category}}</td>
+            <td>{{i.part_group}}</td>
+            <td>{{i.product_group}}</td>
+            <td>{{i.product_name}}</td>
+            <td>{{i.qnt_in_box}}</td>
+            <td>{{i.kg_box}}</td>
+            <td>{{i.kg_single}}</td>
+
+            <td>{{i.date | date:'d-m-Y h:i A'}}</td>
+            <td>
+                <a href="{% url 'products:update_product' i.id %}"><button><i class="far fa-edit"></i></button></a>
+            </td>
+
+        </tr>
+          {% endfor %}
+
+          </tfoot>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            $('#maingroupid').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy','excel','pdf','print','colvis'
+                ]
+            } );
+
+            $('#id_category').select2();
+            $('#id_part_group').select2();
+            $('#id_product_group').select2();
+
+        } );
+
+        {% if messages %}
+        {% for msg in messages %}
+            {% if msg.tags == 'success' %}
+                alertify.success("{{msg}}")
+            {% elif msg.tags == 'error' %}
+                alertify.error("{{msg}}")          
+            {% elif msg.tags == 'info' %}
+                alertify.alert('ئاگاداربە! ','message')
+                alertify.alert("{{msg}}",function(){            
+              })
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+
+    </script>
+    
+    <script>
+    const form = document.getElementById('product_form')
+    form.addEventListener("submit",submitHandler);
+
+    function submitHandler(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'products:product' %}',
+            data : $('#product_form').serialize(),
+            dataType: 'json', 
+            success: successFunction,
+        });
+    }
+    function successFunction(data) {
+        if (data.success) {
+            form.reset();
+            location.reload(true); 
+        }
+        else if(data.error_code=='invalid'){
+            console.log(key +' : '+data.error_msg[key])
+            for(var key in data.error_msg){
+                if(key == 'main_type'){
+                    document.getElementById('category_error').removeAttribute('hidden')
+                    document.getElementById('category_error').innerHTML = data.error_msg[key][0]
+                }
+                else if(key == 'part_group'){
+                    document.getElementById('part_error').removeAttribute('hidden')
+                    document.getElementById('part_error').innerHTML = data.error_msg[key][0]                    
+                }
+                else if(key== 'product_group'){
+                    document.getElementById('product_group_error').removeAttribute('hidden')
+                    document.getElementById('product_group_error').innerHTML = data.error_msg[key][0]  
+                }
+                else if(key== 'product_name'){
+                    document.getElementById('product_name_error').removeAttribute('hidden')
+                    document.getElementById('product_name_error').innerHTML = data.error_msg[key][0]  
+                }
+                else if(key== 'qnt_in_box'){
+                    document.getElementById('qnt_in_box_error').removeAttribute('hidden')
+                    document.getElementById('qnt_in_box_error').innerHTML = data.error_msg[key][0]  
+                }     
+                else if(key== 'kg_single'){
+                    document.getElementById('kg_single_error').removeAttribute('hidden')
+                    document.getElementById('kg_single_error').innerHTML = data.error_msg[key][0]  
+                }                                
+                else if(key== 'kg_box'){
+                    document.getElementById('kg_box_error').removeAttribute('hidden')
+                    document.getElementById('kg_box_error').innerHTML = data.error_msg[key][0]  
+                }                                
+                else if(key== 'info_1'){
+                    document.getElementById('info_1_error').removeAttribute('hidden')
+                    document.getElementById('info_1_error').innerHTML = data.error_msg[key][0]  
+                }    
+                else if(key== 'info_2'){
+                    document.getElementById('info_2_error').removeAttribute('hidden')
+                    document.getElementById('info_2_error').innerHTML = data.error_msg[key][0]  
+                }    
+                else if(key== 'info_3'){
+                    document.getElementById('info_3_error').removeAttribute('hidden')
+                    document.getElementById('info_3_error').innerHTML = data.error_msg[key][0]  
+                }    
+
+            }
+        }
+    }
+
+
+    </script>
+    <script>
+        $('#id_category').change(function(){
+            console.log("hi")
+            const url = $('#product_form').attr("data-partgroups-url");
+            const categoryId = $(this).val();
+
+            $.ajax({
+                url : url,
+                data:{
+                    'category':categoryId
+                },
+                success:function(data){
+                    $('#id_part_group').html(data);
+                    
+                }
+            })
+
+        })
+    </script>
+{% endblock %}
+{% endblock %}
+
+<!-- $.ajax({        
+    url:'{% url 'products:list-maingroup' %}',
+    type:'json',
+    method:'GET',
+    success:function(data){
+    // $('#notify').html(data.length)
+    let content='';
+    for(i = 0;i < data.length; i++){
+
+        content+='<tr>'
+            +'<td>'+data[i]+'</td>'
+            +'<td>'+data[i]["fields"]["admin"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["main_type"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+            +'<td>'+data[i]["fields"]["date"]+ ' : ' + check_out+ ' بۆ '+ check_in+'</td>'
+
+            +'</div>'
+    
+    $(".allnotifi").html(content);
+}
+}}); -->

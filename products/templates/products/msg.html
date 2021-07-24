@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% if messages %}
+{% for msg in messages %}
+    {% if msg.tags == 'info' %}
+        alertify.alert('ئاگاداربە! ','message')
+          alertify.alert("{{msg}}",function(){
+            
+          })
+    {% endif %}
+{% endfor %}
+{% endif %}
+
